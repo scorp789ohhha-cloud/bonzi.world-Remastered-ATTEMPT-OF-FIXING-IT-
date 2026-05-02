@@ -5,6 +5,10 @@
 // Filesystem reading functions
 const fs = require('fs-extra');
 
+// Declare variables properly
+let stats;
+let updating = false;
+
 // Load settings
 try {
 	stats = fs.lstatSync('settings.json');
@@ -38,17 +42,17 @@ const settings = require("./settings.json");
 updating = false;
 
 if (updating == true) {
-var express = require('express');
-var app = express();
-if (settings.express.serveStatic)
-	app.use(express.static('./build/maintenance/themes/win_xp'));
-var server = require('http').createServer(app);
+	var express = require('express');
+	var app = express();
+	if (settings.express.serveStatic)
+		app.use(express.static('./build/maintenance/themes/win_xp'));
+	var server = require('http').createServer(app);
 } else {
-var express = require('express');
-var app = express();
-if (settings.express.serveStatic)
-	app.use(express.static('./build/www'));
-var server = require('http').createServer(app);
+	var express = require('express');
+	var app = express();
+	if (settings.express.serveStatic)
+		app.use(express.static('./build/www'));
+	var server = require('http').createServer(app);
 };
 
 // Init socket.io
@@ -86,42 +90,9 @@ app.use(( req, res, next ) => {
 
 
 // Handle Bonzi.WORLD API requests
- /*app.get('/api/v1/', (req, res) => res.sendStatus('hello world'))
-app.get('/api/v1/rooms/',  function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./rooms.json')));
-})
-app.get('/api/v1/identity/user/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./user.json')));
-})
-app.get('/api/v1/identity/fingerprint/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./fingerprint.json')));
-})
-app.get('/api/v1/session/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./session.json')));
-})
-app.get('/api/v1/login/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./logins.json')));
-})
-app.get('/api/v1/login/register/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./register.json')));
-}) 
-app.get('/api/v1/login/forgot/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./forgot.json')));
-})
-app.get('/api/v1/unload/', function(req, res){
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(require('./unload.json')));
-}) */
 app.use(express.json());
 
-app.get('/api/v1/', async (req, res) => res.sendStatus('hello world'))
+app.get('/api/v1/', async (req, res) => res.send('hello world'))
 app.get('/api/v1/rooms/',  async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(require('./rooms.json')));
@@ -186,28 +157,6 @@ app.post('/api/v1/unload/', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(require('./unload.json')));
 })
-
-
-// Patch logins
-app.post( "/api/v2/login/", async ( req, res ) => {
-    try {
-        const user = await User.findByCredentials(
-            req.body.email,
-            req.body.username,
-            req.body.password
-        );
-        const token = await user.generateAuthToken();
-        res.send( {
-            user,
-            token,
-        } );
-    } catch ( e ) {
-        res.status( 400 ).send( {
-            error: "Catch error",
-            e,
-        } );
-    }
-} );
 
 // ========================================================================
 // Banning functions
